@@ -747,8 +747,194 @@ scroll-box[data-overflow]::after {
 .home-intro { margin-bottom: var(--sp-7); }
 .home-intro .kicker { margin-top: var(--sp-2); }
 
+/* admin: the /admin gate, article list, and editor. Board reference is the
+   WireAdmin and WireLogin canvas boards; the three editor states are
+   documented on ui.AdminEditor. */
+.admin-gate {
+  padding: var(--sp-8) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.admin-gate h1 {
+  font: 800 var(--fs-display) / var(--lh-tight) var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  margin-top: var(--sp-4);
+}
+.gate-note {
+  color: var(--color-ink-muted);
+  max-width: 520px;
+  margin: var(--sp-5) 0 var(--sp-6);
+}
+.cta {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  padding: var(--sp-3) var(--sp-5);
+  font: 700 var(--fs-code) var(--font-mono);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.cta:hover { opacity: 0.92; }
+.gate-back { margin-top: var(--sp-6); font-size: var(--fs-meta); }
+.gate-back a { color: var(--color-accent); text-decoration: none; }
+
+.admin-header .admin-crumb {
+  font: 700 var(--fs-kicker) var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+}
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+.admin-user, .admin-signout {
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--color-ink-muted);
+  text-decoration: none;
+}
+.admin-signout:hover, .admin-user:hover { color: var(--color-accent); }
+
+.btn {
+  display: inline-block;
+  border: var(--bw-hairline) solid var(--color-ink);
+  background: none;
+  color: var(--color-ink);
+  padding: var(--sp-2) var(--sp-4);
+  font: 700 var(--fs-kicker) var(--font-mono);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.btn.primary {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  border-color: var(--color-accent);
+}
+.btn:disabled {
+  background: none;
+  border-color: var(--color-border);
+  color: var(--color-ink-muted);
+  font-weight: 400;
+  cursor: default;
+}
+.btn-small { padding: var(--sp-1) var(--sp-3); font-size: var(--fs-micro); }
+
+/* The state chip: an 8px square drawn by ::before, accent fill for unsaved,
+   border outline for saved (design-system.md section 1 drift notes). */
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--color-ink-muted);
+}
+.state::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  flex: none;
+}
+.state.unsaved { color: var(--color-accent); font-weight: 700; }
+.state.unsaved::before { background: var(--color-accent); }
+.state.saved::before,
+.state.draft::before { border: var(--bw-hairline) solid var(--color-border); }
+.state.published::before { background: var(--color-accent); }
+
+.admin-main { padding-top: var(--sp-5); padding-bottom: var(--sp-7); }
+.admin-new {
+  display: flex;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-6);
+}
+.admin-new .in { flex: 1; max-width: 480px; }
+.admin-rows { border-top: var(--bw-rule) solid var(--color-ink); }
+.admin-row {
+  display: grid;
+  grid-template-columns: var(--col-date) minmax(0, 1fr) auto;
+  gap: var(--sp-4);
+  align-items: baseline;
+  padding: var(--sp-3) 0;
+  border-bottom: var(--bw-hairline) solid var(--color-border);
+}
+.admin-row-title {
+  font: 700 var(--fs-title) var(--font-mono);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+.admin-row-title:hover { color: var(--color-accent); }
+.admin-row-meta { font-size: var(--fs-micro); color: var(--color-ink-muted); }
+
+.fld-grid { display: grid; gap: var(--sp-3); margin-bottom: var(--sp-3); }
+.fld-grid-top { grid-template-columns: 2fr 1fr 1fr; }
+.fld-grid-meta { grid-template-columns: 1fr 3fr; margin-bottom: var(--sp-5); }
+.fld { display: flex; flex-direction: column; gap: var(--sp-1); }
+.fld label {
+  font-size: var(--fs-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+.in {
+  border: var(--bw-hairline) solid var(--color-border);
+  background: var(--color-code-bg);
+  color: var(--color-ink);
+  padding: var(--sp-2) var(--sp-3);
+  font: var(--fs-code) / var(--lh-code) var(--font-mono);
+}
+.in:focus { outline: none; border-color: var(--color-accent); }
+.in-static { color: var(--color-ink-muted); }
+
+.editor-panes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+  align-items: start;
+}
+.pane {
+  border: var(--bw-hairline) solid var(--color-border);
+  background: var(--color-code-bg);
+}
+.panehd {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: var(--bw-hairline) solid var(--color-border);
+  background: var(--color-surface);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+.src {
+  display: block;
+  width: 100%;
+  min-height: 480px;
+  border: none;
+  background: none;
+  resize: vertical;
+  padding: var(--sp-4);
+  font: var(--fs-code) / var(--lh-prose) var(--font-mono);
+  color: var(--color-ink);
+}
+.src:focus { outline: none; }
+.pv { padding: var(--sp-4) var(--sp-5); min-height: 480px; }
+/* In-flight preview: the last render stays put, dimmed. No spinner, no
+   blanking (admin board, third state). */
+.pv.in-flight { opacity: 0.4; }
+
 /* 5. breakpoints. The ONLY layout media queries; add here or not at all. */
 @media (max-width: 900px) {
+  .editor-panes { grid-template-columns: minmax(0, 1fr); }
+  .fld-grid-top, .fld-grid-meta { grid-template-columns: minmax(0, 1fr); }
   .aside-shell { grid-template-columns: minmax(0, 1fr); }
   .docs-shell { grid-template-columns: minmax(0, 1fr); }
   .docs-nav-column { display: none; }

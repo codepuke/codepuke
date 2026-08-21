@@ -1,0 +1,168 @@
+package ui
+
+import (
+	"fmt"
+
+	"github.com/codepuke/codepuke/internal/store"
+)
+
+// adminShell is the admin page frame: the public head plus admin.js, its own
+// header bar rendered by each page, and the standard footer.
+templ adminShell(title string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<meta name="robots" content="noindex"/>
+			<title>{ title }</title>
+			<link rel="stylesheet" href="/static/site.css"/>
+			<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
+			<script src="/static/site.js" defer></script>
+			<script src="/static/admin.js" defer></script>
+		</head>
+		<body>
+			{ children... }
+			<footer class="site-footer">
+				<span>codepuke.com</span>
+				<span>EOF</span>
+			</footer>
+		</body>
+	</html>
+}
+
+// AdminLoginPage is the /admin gate for anyone without a valid author
+// session. noGroup distinguishes "not signed in" from "signed in without the
+// authors group".
+templ AdminLoginPage(loginURL string, noGroup bool) {
+	@Layout("admin // codepuke") {
+		<div class="admin-gate">
+			<div class="kicker">{ "/admin // authentication required" }</div>
+			<h1>AUTHORS ONLY<br/>BEYOND THIS POINT</h1>
+			if noGroup {
+				<p class="gate-note">
+					signed in, but your account is missing the authors group.
+					membership is granted in authentik; no deploy needed.
+				</p>
+				<a class="cta" href={ templ.URL(loginURL) }>{ "sign in again →" }</a>
+			} else {
+				<p class="gate-note">
+					you will be sent to the identity provider and returned here.
+					the whole exchange is one redirect each way.
+				</p>
+				<a class="cta" href={ templ.URL(loginURL) }>{ "continue to sign in →" }</a>
+			}
+			<p class="gate-back"><a href="/">{ "← back to the site" }</a></p>
+		</div>
+	}
+}
+
+templ adminHeader(crumb, user string) {
+	<header class="site-header admin-header">
+		<span class="admin-crumb">{ crumb }</span>
+		<div class="admin-actions">
+			<a class="admin-user" href="/admin">{ user + " // authors" }</a>
+			{ children... }
+			<a class="admin-signout" href="/auth/logout">sign out</a>
+		</div>
+	</header>
+}
+
+// AdminIndexPage lists every article, drafts included, and creates drafts.
+templ AdminIndexPage(rows []store.AdminArticleRow, user string) {
+	@adminShell("admin // codepuke") {
+		@adminHeader("codepuke // admin // articles", user)
+		<main class="site-main admin-main">
+			<form class="admin-new" method="post" action="/admin/articles">
+				<input class="in" type="text" name="title" placeholder="new article title" required/>
+				<button class="btn primary" type="submit">create draft</button>
+			</form>
+			<div class="admin-rows">
+				for _, row := range rows {
+					<div class="admin-row">
+						if row.PublishedAt != nil {
+							<span class="state published">{ Date(*row.PublishedAt) }</span>
+						} else {
+							<span class="state draft">draft</span>
+						}
+						<a class="admin-row-title" href={ templ.URL(fmt.Sprintf("/admin/articles/%d", row.ID)) }>{ row.Title }</a>
+						<span class="admin-row-meta">{ "updated " + Date(row.UpdatedAt) }</span>
+					</div>
+				}
+			</div>
+		</main>
+	}
+}
+
+// AdminEditorPage is the article editor: metadata grid, markdown pane, and
+// the server-round-trip preview pane. Everything works as a plain form; the
+// admin-editor element only adds the live state dot and the fetch preview.
+templ AdminEditorPage(m AdminEditor) {
+	@adminShell(m.Title + " // admin // codepuke") {
+		<admin-editor>
+			@adminHeader("codepuke // admin // edit article", m.User) {
+				if m.Unsaved {
+					<span class="state unsaved" data-state>unsaved changes</span>
+				} else {
+					<span class="state saved" data-state>{ "saved " + m.SavedAt }</span>
+				}
+				<button class="btn primary" type="submit" form="editor" name="action" value="save" data-save disabled?={ !m.Unsaved }>save draft</button>
+				if m.Published {
+					<button class="btn" type="submit" form="editor" name="action" value="unpublish">unpublish</button>
+				} else {
+					<button class="btn" type="submit" form="editor" name="action" value="publish">publish</button>
+				}
+			}
+			<main class="site-main admin-main">
+				<form id="editor" method="post" action={ templ.URL(fmt.Sprintf("/admin/articles/%d", m.ID)) }>
+					<div class="fld-grid fld-grid-top">
+						<div class="fld">
+							<label for="f-title">title</label>
+							<input class="in" id="f-title" type="text" name="title" value={ m.Title } required/>
+						</div>
+						<div class="fld">
+							<label>slug</label>
+							<div class="in in-static">{ m.Slug }</div>
+						</div>
+						<div class="fld">
+							<label for="f-date">publish date</label>
+							<input class="in" id="f-date" type="date" name="date" value={ m.Date }/>
+						</div>
+					</div>
+					<div class="fld-grid fld-grid-meta">
+						<div class="fld">
+							<label for="f-author">author</label>
+							<input class="in" id="f-author" type="text" name="author" value={ m.Author }/>
+						</div>
+						<div class="fld">
+							<label for="f-tags">categories</label>
+							<input class="in" id="f-tags" type="text" name="tags" value={ m.Tags } placeholder="comma-separated"/>
+						</div>
+					</div>
+					<div class="editor-panes">
+						<div class="pane">
+							<div class="panehd">
+								<span>markdown</span>
+								<span>{ fmt.Sprintf("%d chars", len(m.BodyMD)) }</span>
+							</div>
+							<textarea class="src" name="body_md" spellcheck="false">{ m.BodyMD }</textarea>
+						</div>
+						<div class="pane">
+							<div class="panehd">
+								if m.Unsaved {
+									<span data-preview-status>{ "preview // rendered just now" }</span>
+								} else {
+									<span data-preview-status>{ "preview // from last save" }</span>
+								}
+								<button class="btn btn-small" type="submit" form="editor" name="action" value="preview" data-preview-btn>update preview</button>
+							</div>
+							<div class="pv prose-body" data-preview-pane>
+								@templ.Raw(m.PreviewHTML)
+							</div>
+						</div>
+					</div>
+				</form>
+			</main>
+		</admin-editor>
+	}
+}

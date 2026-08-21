@@ -78,3 +78,22 @@ type DocsNavModel struct {
 	Version     string
 	Items       []DocsNavItem
 }
+
+// AdminEditor feeds the article editor. The three states the admin board
+// defines map onto it: Unsaved false is "saved SavedAt" with the save button
+// disabled, Unsaved true is "unsaved changes" (the no-JS preview round trip
+// lands here), and the in-flight state exists only in admin.js.
+type AdminEditor struct {
+	ID          int64
+	Slug        string
+	Title       string
+	Author      string
+	Date        string // publish date field, yyyy-mm-dd
+	Tags        string // comma-separated category slugs
+	BodyMD      string
+	PreviewHTML string
+	Published   bool
+	Unsaved     bool
+	SavedAt     string // updated_at clock time, UTC
+	User        string
+}

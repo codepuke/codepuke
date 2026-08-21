@@ -8,3 +8,7 @@ data:
   LOG_FORMAT: json
   BASE_URL: https://codepuke.com
   MERMAID_URL: http://localhost:8002
+  # OIDC client ids are committed config (deploy/PLAN.md); the client secret
+  # and session key ride in the codepuke-secrets Secret.
+  OIDC_ISSUER: https://authlayer.cloud/application/o/codepuke/
+  OIDC_CLIENT_ID: codepuke

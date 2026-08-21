@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"bytes"
 	"log/slog"
 	"strings"
 	"testing"
@@ -97,6 +98,61 @@ func TestParse(t *testing.T) {
 				BaseURL:     "https://codepuke.com",
 			},
 		},
+		{
+			name: "auth enabled when all four vars are set",
+			env: map[string]string{
+				"DATABASE_URL":       "postgres://u:p@localhost/db",
+				"SESSION_KEY":        strings.Repeat("ab", 32),
+				"OIDC_ISSUER":        "https://authlayer.cloud/application/o/codepuke/",
+				"OIDC_CLIENT_ID":     "codepuke",
+				"OIDC_CLIENT_SECRET": "hunter2",
+			},
+			want: config.Config{
+				Addr:             ":8080",
+				DatabaseURL:      "postgres://u:p@localhost/db",
+				LogLevel:         slog.LevelInfo,
+				LogFormat:        "text",
+				BaseURL:          "https://codepuke.com",
+				SessionKey:       bytes.Repeat([]byte{0xab}, 32),
+				OIDCIssuer:       "https://authlayer.cloud/application/o/codepuke/",
+				OIDCClientID:     "codepuke",
+				OIDCClientSecret: "hunter2",
+				OIDCGroup:        "codepuke-authors",
+			},
+		},
+
+		// invalid auth
+		{
+			name: "partial auth vars rejected",
+			env: map[string]string{
+				"DATABASE_URL": "postgres://u:p@localhost/db",
+				"SESSION_KEY":  strings.Repeat("ab", 32),
+			},
+			wantErr: "must be set together",
+		},
+		{
+			name: "short session key rejected",
+			env: map[string]string{
+				"DATABASE_URL":       "postgres://u:p@localhost/db",
+				"SESSION_KEY":        "abcd",
+				"OIDC_ISSUER":        "https://authlayer.cloud/application/o/codepuke/",
+				"OIDC_CLIENT_ID":     "codepuke",
+				"OIDC_CLIENT_SECRET": "hunter2",
+			},
+			wantErr: "SESSION_KEY must be 32 hex-encoded bytes",
+		},
+		{
+			name: "non-hex session key rejected",
+			env: map[string]string{
+				"DATABASE_URL":       "postgres://u:p@localhost/db",
+				"SESSION_KEY":        strings.Repeat("zz", 32),
+				"OIDC_ISSUER":        "https://authlayer.cloud/application/o/codepuke/",
+				"OIDC_CLIENT_ID":     "codepuke",
+				"OIDC_CLIENT_SECRET": "hunter2",
+			},
+			wantErr: "SESSION_KEY",
+		},
+
 		{
 			name: "log level is case-insensitive",
 			env: map[string]string{

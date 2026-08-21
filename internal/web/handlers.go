@@ -11,6 +11,7 @@ import (
 
 	"github.com/a-h/templ"
 
+	"github.com/codepuke/codepuke/internal/auth"
 	"github.com/codepuke/codepuke/internal/content"
 	"github.com/codepuke/codepuke/internal/store"
 	"github.com/codepuke/codepuke/ui"
@@ -23,6 +24,8 @@ type handlers struct {
 	baseURL  string
 	manifest *content.Manifest
 	docs     map[string]content.ManifestProject // project slug -> docs
+	auth     *auth.Authenticator                // nil: no admin surface
+	renderer *content.Pipeline
 }
 
 func (h *handlers) render(w http.ResponseWriter, r *http.Request, status int, c templ.Component) {

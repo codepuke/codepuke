@@ -46,7 +46,8 @@ patches:
       - op: remove
         path: /metadata/annotations/traefik.ingress.kubernetes.io~1router.middlewares
 
-  # Dev-facing base URL; the rest of codepuke-env is inherited.
+  # Dev-facing base URL and the codepuke-dev Authentik application; the rest
+  # of codepuke-env is inherited.
   - target:
       kind: ConfigMap
       name: codepuke-env
@@ -57,6 +58,8 @@ patches:
         name: codepuke-env
       data:
         BASE_URL: https://dev.codepuke.com
+        OIDC_ISSUER: https://authlayer.cloud/application/o/codepuke-dev/
+        OIDC_CLIENT_ID: codepuke-dev
 
   # environment=dev on the pod itself; Alloy promotes this to a Loki label.
   - target:

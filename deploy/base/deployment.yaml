@@ -38,6 +38,9 @@ spec:
           envFrom:
             - configMapRef:
                 name: codepuke-env
+            # SESSION_KEY and OIDC_CLIENT_SECRET, materialized by ESO.
+            - secretRef:
+                name: codepuke-secrets
           env:
             - name: DATABASE_URL
               valueFrom:

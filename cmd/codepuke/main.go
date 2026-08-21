@@ -13,6 +13,7 @@ import (
 	"time"
 
 	contentfs "github.com/codepuke/codepuke/content"
+	"github.com/codepuke/codepuke/internal/auth"
 	"github.com/codepuke/codepuke/internal/config"
 	"github.com/codepuke/codepuke/internal/store"
 	"github.com/codepuke/codepuke/internal/web"
@@ -96,7 +97,25 @@ func serve() error {
 		return err
 	}
 
-	handler, err := web.New(web.Deps{Store: st, Content: contentfs.FS, BaseURL: cfg.BaseURL})
+	deps := web.Deps{Store: st, Content: contentfs.FS, BaseURL: cfg.BaseURL}
+	if cfg.AuthEnabled() {
+		deps.Auth, err = auth.New(auth.Options{
+			Issuer:       cfg.OIDCIssuer,
+			ClientID:     cfg.OIDCClientID,
+			ClientSecret: cfg.OIDCClientSecret,
+			BaseURL:      cfg.BaseURL,
+			Group:        cfg.OIDCGroup,
+			SessionKey:   cfg.SessionKey,
+		})
+		if err != nil {
+			return err
+		}
+		deps.Renderer = pipeline
+		slog.Info("admin enabled", "issuer", cfg.OIDCIssuer, "group", cfg.OIDCGroup)
+	} else {
+		slog.Info("admin disabled: auth is not configured")
+	}
+	handler, err := web.New(deps)
 	if err != nil {
 		return err
 	}

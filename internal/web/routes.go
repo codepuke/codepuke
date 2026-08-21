@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/codepuke/codepuke/internal/auth"
 	"github.com/codepuke/codepuke/internal/content"
 	"github.com/codepuke/codepuke/internal/store"
 )
@@ -22,6 +23,13 @@ type Deps struct {
 	Content fs.FS
 	// BaseURL is the public origin for absolute links (RSS).
 	BaseURL string
+	// Auth gates /admin; nil disables the admin surface entirely (its
+	// routes are simply not registered, so everything under it is a 404).
+	Auth *auth.Authenticator
+	// Renderer is the markdown pipeline behind the editor's save and
+	// preview round trips. Required when Auth is set; public request
+	// handlers never touch it.
+	Renderer *content.Pipeline
 }
 
 // Pinger reports whether the backing database is reachable.
@@ -53,11 +61,17 @@ func New(deps Deps) (http.Handler, error) {
 		return nil, fmt.Errorf("load content manifest: %w", err)
 	}
 
+	if deps.Auth != nil && deps.Renderer == nil {
+		return nil, fmt.Errorf("web.New: Auth requires Renderer")
+	}
+
 	h := &handlers{
 		store:    deps.Store,
 		baseURL:  deps.BaseURL,
 		manifest: manifest,
 		docs:     map[string]content.ManifestProject{},
+		auth:     deps.Auth,
+		renderer: deps.Renderer,
 	}
 	for _, src := range manifest.Sources {
 		for _, proj := range src.Projects {
@@ -80,6 +94,17 @@ func New(deps Deps) (http.Handler, error) {
 	mux.HandleFunc("GET /docs/{project}", h.docsProject)
 	mux.HandleFunc("GET /docs/{project}/{slug}", h.docPage)
 	mux.HandleFunc("GET /rss.xml", h.rss)
+
+	if h.auth != nil {
+		mux.HandleFunc("GET /auth/login", h.authLogin)
+		mux.HandleFunc("GET /auth/callback", h.authCallback)
+		mux.HandleFunc("GET /auth/logout", h.authLogout)
+		mux.Handle("GET /admin", h.requireAuthor(h.adminIndex))
+		mux.Handle("POST /admin/articles", h.requireAuthor(h.adminCreate))
+		mux.Handle("GET /admin/articles/{id}", h.requireAuthor(h.adminEditor))
+		mux.Handle("POST /admin/articles/{id}", h.requireAuthor(h.adminSave))
+		mux.Handle("POST /admin/preview", h.requireAuthor(h.adminPreview))
+	}
 
 	static := http.FileServerFS(staticFS())
 	mux.Handle("GET /static/", http.StripPrefix("/static/", cacheStatic(static)))
