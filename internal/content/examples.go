@@ -35,9 +35,10 @@ var topicRe = regexp.MustCompile(`^[a-z0-9][a-z0-9-]*$`)
 
 // renderExamplesBlock expands ":::examples <topic>" into the <code-tabs>
 // contract of design-system.md 4a: every variant ships pre-highlighted, in
-// the site-wide language order.
-func renderExamplesBlock(w util.BufWriter, p *Pipeline, args string) error {
-	topic := strings.TrimSpace(args)
+// the site-wide language order. A render-level examples default becomes
+// data-default on the element so page context beats stored preference.
+func renderExamplesBlock(w util.BufWriter, p *Pipeline, d *directiveBlock) error {
+	topic := strings.TrimSpace(d.Args)
 	if topic == "" {
 		return errors.New(":::examples requires a topic id")
 	}
@@ -66,7 +67,11 @@ func renderExamplesBlock(w util.BufWriter, p *Pipeline, args string) error {
 		}
 	}
 
-	fmt.Fprintf(w, `<code-tabs data-topic="%s">`, topic)
+	if d.DefaultLang != "" && knownLang(d.DefaultLang) {
+		fmt.Fprintf(w, `<code-tabs data-topic="%s" data-default="%s">`, topic, d.DefaultLang)
+	} else {
+		fmt.Fprintf(w, `<code-tabs data-topic="%s">`, topic)
+	}
 	for _, l := range languages {
 		ex, ok := byLang[l.Lang]
 		if !ok {

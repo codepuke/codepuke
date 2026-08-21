@@ -258,8 +258,11 @@ Every public page: header bar, content, footer.
 
 - Header: flex row, space-between, `--bw-rule` bottom border in
   `--color-ink`, `--sp-4 var(--page-pad)` padding. Left: the site name in
-  700 mono. Right: nav links (articles, projects, docs, rss) in `--fs-kicker`
-  uppercase, gap `--sp-5`, color `--color-ink`.
+  700 mono. Right: nav links (articles, projects, rss) in `--fs-kicker`
+  uppercase, gap `--sp-5`, color `--color-ink`. There is no "docs" nav item:
+  a docs picker would duplicate the projects page, whose cards open straight
+  into each project's docs. The `/docs` and `/docs/{project}` routes remain
+  as redirects for typed URLs.
 - Footer: same rule on top, `codepuke.com` left, `EOF` right, both
   `--fs-micro` muted uppercase.
 - Content: `var(--page-pad)` horizontal padding.
@@ -303,7 +306,11 @@ Projects index.
 - Card: `--bw-hairline` border, `--sp-4` padding, column flex with `--sp-2`
   gap. Name (mono 700, `--fs-title`), description (muted, `--fs-meta`,
   flex-grow so footers align), footer row split by a hairline: version chip
-  left, `open` link right.
+  then a GitHub mark left, `open` link right. The mark is the site's one
+  inline icon: a 14px currentColor octicon SVG (`.gh-mark`, muted, accent
+  on hover) linking the project's `repo_url`; it renders only when the row
+  has one. `open` goes to the project's first docs page, or the repository
+  when it has no docs.
 - Hover: border color goes accent. That is the entire hover treatment.
 - 900px: two columns. 480px: one column.
 - A family with one project renders one card in the same grid; the grid does
@@ -357,7 +364,11 @@ never require a code change, a CSS change, or a template change.
   `// descriptor` in muted `--fs-meta`. Right: `N projects` in `--fs-micro`
   uppercase muted.
 - Sidebar variant (home aside, phone home): one line at `--fs-micro`
-  uppercase: name in 700 ink, `// descriptor` muted. No count.
+  uppercase, fully muted, marked with a `--bw-bar` accent left edge and
+  `--sp-3` left padding. No count. The muting and the bar exist so the
+  family reads as a group label, never as an entry in the project list
+  below it; project entries under it stack name (`--fs-title` 700, its own
+  line) over description (`--fs-meta` muted).
 - No numbering anywhere. Display order comes from the query (currently: by
   name); the design encodes nothing about order, so reordering is free.
 
@@ -402,13 +413,22 @@ the styled base CSS, not a fallback hack; it must look finished.
 2. Hides the `ct-label` rows (`code-tabs[data-active] .ct-label
    { display: none; }`) and toggles the `hidden` attribute on every
    non-active section.
-3. Reads the initial language from `localStorage["codepuke:lang"]`, falling
-   back to the first section; reflects it as `data-active="<lang>"` on the
-   host.
-4. On tab click: writes localStorage and dispatches a
-   `codepuke:lang` CustomEvent (detail: the lang) on `document`. Every
-   code-tabs instance listens and follows, so all blocks on a page stay in
-   sync.
+3. Picks the initial language by priority: the host's `data-default`
+   attribute, then `localStorage["codepuke:lang"]`, then the first section;
+   reflects it as `data-active="<lang>"` on the host. Page context beats
+   stored preference: the renderer bakes `data-default="<lang>"` into every
+   code-tabs inside a project's docs (the project's own language), so pygob
+   docs always open on Python no matter what a reader chose elsewhere.
+   Articles carry no `data-default`.
+4. On tab click: dispatches a `codepuke:lang` CustomEvent (detail: the
+   lang) on `document`; every instance listens and follows, so all blocks
+   on a page stay in sync. The choice is written to localStorage only when
+   the host has no `data-default`: switching languages on a docs page is
+   comparing, not declaring a preference.
+5. Scroll anchoring: before dispatching, the element records its own
+   viewport offset and restores it with `scrollBy` after every block has
+   switched, so the clicked block never moves even when other languages'
+   variants are shorter or longer.
 
 Tab styling: `--fs-micro` uppercase mono chips, hairline border, muted;
 active tab gets accent fill with `--color-on-accent` text and 700 weight.
@@ -536,6 +556,14 @@ One templ partial for the nav, rendered twice per docs page; CSS shows one:
   page in the project's nav order, which is data (doc ordering from the sync
   manifest), not markup invention. Active item: accent, 700,
   `aria-current="page"`.
+- The active item is followed by the page's h2 outline as
+  `<ul class="nav-sub">`: one `<li data-title="…">` per h2, each an anchor
+  link to the heading's id, showing the `0x01` label (accent) and the
+  heading text at `--fs-micro` muted. Rows are single-line, fading out via
+  a CSS mask when too long; hovering shows the full title as a pure-CSS
+  tooltip from the li's `data-title` (surface fill, hairline border). The
+  outline is extracted server-side from the stored HTML's 4f anchors; both
+  rendered copies of the nav carry it, and no JS is involved.
 - The duplication is server-side and free; only one copy is ever displayed,
   so screen readers see a single nav.
 
@@ -631,9 +659,10 @@ The complete list. Both are custom elements that enhance markup already
 working without them, per CLAUDE.md.
 
 1. **`<code-tabs>`** (4a): builds the tab row, toggles `hidden` on sections,
-   persists to `localStorage["codepuke:lang"]`, syncs instances through the
-   `codepuke:lang` document event. Roughly forty lines. Without it: all
-   variants visible with labels.
+   syncs instances through the `codepuke:lang` document event, anchors the
+   clicked block on switch, and persists to `localStorage["codepuke:lang"]`
+   only where no `data-default` context applies. Roughly fifty lines.
+   Without it: all variants visible with labels.
 2. **`<scroll-box>`** (4c): measures `scrollWidth` against `clientWidth`,
    toggles `data-overflow`, re-measures via one ResizeObserver. Roughly
    twenty lines. Without it: native horizontal scroll with a styled,
@@ -648,6 +677,10 @@ real URLs.
 ## 7. Webfonts
 
 **None. Zero bytes.** Every surface uses the two system stacks in section 1.
+The favicon is the one graphical asset: `static/favicon.svg`, the text
+`xCP` in the dark-scheme accent (`#a4f43b`) on a `#0b0d0a` rounded square
+(`rx` 12 of 64), rendered in the system mono stack. It is an SVG so it
+costs a few hundred bytes and inherits no font.
 The identity comes from weight, case, color, and structure, not from glyph
 shapes, so the mono stack differing across platforms (SF Mono on macOS,
 Cascadia or Consolas on Windows, DejaVu on Linux) changes texture slightly

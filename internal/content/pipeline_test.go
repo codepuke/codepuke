@@ -199,6 +199,28 @@ func TestExamplesBlock(t *testing.T) {
 		assert.Less(t, strings.Index(out, `data-lang="go"`), strings.Index(out, `data-lang="python"`))
 	})
 
+	t.Run("examples default becomes data-default", func(t *testing.T) {
+		t.Parallel()
+		out, err := p.Render(t.Context(), []byte(":::examples encode-struct\n"),
+			content.WithExamplesDefault("python"))
+		require.NoError(t, err)
+		assert.Contains(t, string(out), `<code-tabs data-topic="encode-struct" data-default="python">`)
+	})
+
+	t.Run("unknown examples default is dropped", func(t *testing.T) {
+		t.Parallel()
+		out, err := p.Render(t.Context(), []byte(":::examples encode-struct\n"),
+			content.WithExamplesDefault("cobol"))
+		require.NoError(t, err)
+		assert.NotContains(t, string(out), "data-default")
+	})
+
+	t.Run("no default without the option", func(t *testing.T) {
+		t.Parallel()
+		out := render(t, p, ":::examples encode-struct\n")
+		assert.NotContains(t, out, "data-default")
+	})
+
 	t.Run("unknown topic errors", func(t *testing.T) {
 		t.Parallel()
 		_, err := p.Render(t.Context(), []byte(":::examples nope\n"))

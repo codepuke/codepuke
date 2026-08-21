@@ -127,7 +127,8 @@ func seedFixtures(ctx context.Context) error {
 	select 'doc', p.id, v.slug, v.title, 'dan wolf', '# md', v.body, 1, now()
 	from projects p,
 	     (values ('overview', 'Overview', '<p>the overview doc</p>'),
-	             ('streams', 'Reading Streams', '<p>the streams doc</p>')) as v(slug, title, body)
+	             ('streams', 'Reading Streams',
+	              '<h2 id="frames"><a class="offset-anchor" href="#frames">0x01</a> Reading Frames</h2><p>the streams doc</p>')) as v(slug, title, body)
 	where p.slug = 'gobspect';
 	`
 	_, err := testPool.Exec(ctx, sql)
@@ -227,6 +228,18 @@ func TestDocsPages(t *testing.T) {
 		assert.Contains(t, body, `aria-current="page"`)
 		assert.Contains(t, body, `<span>00</span>Overview`)
 		assert.Contains(t, body, `<span>01</span>Reading Streams`)
+	})
+
+	t.Run("active item lists its h2 sections", func(t *testing.T) {
+		t.Parallel()
+		_, body := get(t, "/docs/gobspect/streams")
+		assert.Equal(t, 2, countOccurrences(body, `class="nav-sub"`), "both nav copies carry the outline")
+		assert.Contains(t, body, `data-title="Reading Frames"`)
+		assert.Contains(t, body, `href="#frames"`)
+		assert.Contains(t, body, `<span>0x01</span>`)
+
+		_, overview := get(t, "/docs/gobspect/overview")
+		assert.NotContains(t, overview, "nav-sub", "pages without h2s get no outline")
 	})
 
 	t.Run("project root redirects to first doc", func(t *testing.T) {

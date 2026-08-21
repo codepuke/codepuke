@@ -37,8 +37,8 @@ templ Home(articles []store.ArticleSummary, groups []FamilyGroup) {
 					<ul class="aside-projects">
 						for _, c := range g.Cards {
 							<li>
-								<a href={ templ.URL(c.OpenURL) }>{ c.Project.Name }</a>
-								<span class="desc">{ c.Project.Description }</span>
+								<a class="p-name" href={ templ.URL(c.OpenURL) }>{ c.Project.Name }</a>
+								<div class="desc">{ c.Project.Description }</div>
 							</li>
 						}
 					</ul>

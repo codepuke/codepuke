@@ -107,11 +107,36 @@ func (r *nodeRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 	})
 }
 
+// RenderOption tweaks a single Render call.
+type RenderOption func(*renderOpts)
+
+type renderOpts struct {
+	examplesDefault string
+}
+
+// WithExamplesDefault stamps data-default="<lang>" on every code-tabs block
+// in this render. Page context beats stored preference: a project's docs
+// open examples on that project's language, and language clicks there are
+// never persisted.
+func WithExamplesDefault(lang string) RenderOption {
+	return func(o *renderOpts) { o.examplesDefault = lang }
+}
+
+// defaultLangKey carries the examples default through goldmark's parser
+// context into the directive nodes.
+var defaultLangKey = parser.NewContextKey()
+
 // Render converts markdown to sanitized HTML. Mermaid diagrams are rendered
 // to SVG first and spliced in after sanitization; if the renderer is
 // unavailable they stay highlighted code blocks.
-func (p *Pipeline) Render(ctx context.Context, source []byte) ([]byte, error) {
-	doc := p.md.Parser().Parse(text.NewReader(source))
+func (p *Pipeline) Render(ctx context.Context, source []byte, opts ...RenderOption) ([]byte, error) {
+	var o renderOpts
+	for _, opt := range opts {
+		opt(&o)
+	}
+	pctx := parser.NewContext()
+	pctx.Set(defaultLangKey, o.examplesDefault)
+	doc := p.md.Parser().Parse(text.NewReader(source), parser.WithContext(pctx))
 
 	slots, err := p.renderMermaid(ctx, doc, source)
 	if err != nil {

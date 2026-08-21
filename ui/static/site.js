@@ -1,8 +1,12 @@
 // The complete JS inventory (design-system.md section 6): two custom
 // elements that enhance markup already working without them.
 
-// 4a. <code-tabs>: builds the tab row, toggles sections, persists the
-// language choice, and keeps every instance on the page in sync.
+// 4a. <code-tabs>: builds the tab row, toggles sections, and keeps every
+// instance on the page in sync. Page context beats stored preference: a
+// data-default attribute (baked in by the renderer for project docs) wins
+// the initial state, and clicks on such pages are never persisted. When a
+// switch changes block heights, the clicked block is scroll-anchored so the
+// reader never loses their place.
 customElements.define("code-tabs", class extends HTMLElement {
   connectedCallback() {
     if (this.querySelector(":scope > .ct-tabs")) return;
@@ -19,8 +23,12 @@ customElements.define("code-tabs", class extends HTMLElement {
       tab.dataset.lang = s.dataset.lang;
       tab.textContent = s.querySelector(".ct-label")?.textContent ?? s.dataset.lang;
       tab.addEventListener("click", () => {
-        localStorage.setItem("codepuke:lang", s.dataset.lang);
+        if (!this.dataset.default) {
+          localStorage.setItem("codepuke:lang", s.dataset.lang);
+        }
+        const top = this.getBoundingClientRect().top;
         document.dispatchEvent(new CustomEvent("codepuke:lang", { detail: s.dataset.lang }));
+        window.scrollBy(0, this.getBoundingClientRect().top - top);
       });
       nav.append(tab);
     }
@@ -37,7 +45,7 @@ customElements.define("code-tabs", class extends HTMLElement {
       }
     };
     document.addEventListener("codepuke:lang", (e) => show(e.detail));
-    show(localStorage.getItem("codepuke:lang"));
+    show(this.dataset.default || localStorage.getItem("codepuke:lang"));
   }
 });
 

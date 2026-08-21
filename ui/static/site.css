@@ -360,6 +360,13 @@ pre.chroma, .chroma pre {
   letter-spacing: var(--track-label);
   color: var(--color-accent);
 }
+.gh-mark {
+  color: var(--color-ink-muted);
+  display: inline-flex;
+  align-self: center;
+}
+.gh-mark:hover { color: var(--color-accent); }
+.card .gh-mark { margin-left: var(--sp-2); }
 
 .article-tags {
   display: flex;
@@ -472,11 +479,18 @@ pre.chroma, .chroma pre {
   color: var(--color-ink-muted);
 }
 
+/* The family line is a group label, not a project: fully muted, bar-marked,
+   and set apart so it cannot be misread as an entry in the list below. */
 .family-line {
   font-size: var(--fs-micro);
   text-transform: uppercase;
   letter-spacing: var(--track-label);
+  color: var(--color-ink-muted);
+  border-left: var(--bw-bar) solid var(--color-accent);
+  padding-left: var(--sp-3);
+  margin-top: var(--sp-5);
 }
+.family-line:first-of-type { margin-top: 0; }
 .family-line .family-name { font-weight: 700; }
 .family-line .family-desc { color: var(--color-ink-muted); }
 
@@ -487,11 +501,16 @@ pre.chroma, .chroma pre {
 }
 .aside-projects li {
   border-bottom: var(--bw-hairline) solid var(--color-border);
-  padding: var(--sp-2) 0;
+  padding: var(--sp-3) 0;
+}
+.aside-projects .p-name {
+  display: block;
+  font: 700 var(--fs-title) var(--font-mono);
 }
 .aside-projects .desc {
   color: var(--color-ink-muted);
   font-size: var(--fs-meta);
+  margin-top: var(--sp-1);
 }
 
 /* 4a. code-tabs: no-JS default state is the styled base */
@@ -628,6 +647,41 @@ scroll-box[data-overflow]::after {
   font-weight: 700;
 }
 .docs-nav .nav-item.on span { color: var(--color-accent); }
+
+/* h2 outline of the active page: subdued anchor links, one line each,
+   fading out on overflow; the full title appears as a tooltip on hover. */
+.docs-nav .nav-sub {
+  list-style: none;
+  margin: var(--sp-1) 0 var(--sp-2);
+  padding: 0 0 0 var(--sp-6);
+}
+.docs-nav .nav-sub li { position: relative; }
+.docs-nav .nav-sub a {
+  display: block;
+  font-size: var(--fs-micro);
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 1px 0;
+  mask-image: linear-gradient(to right, black 82%, transparent);
+  -webkit-mask-image: linear-gradient(to right, black 82%, transparent);
+}
+.docs-nav .nav-sub a:hover { color: var(--color-accent); }
+.docs-nav .nav-sub a span { color: var(--color-accent); margin-right: var(--sp-2); }
+.docs-nav .nav-sub li:hover::after {
+  content: attr(data-title);
+  position: absolute;
+  left: var(--sp-6);
+  top: 100%;
+  z-index: 1;
+  background: var(--color-surface);
+  border: var(--bw-hairline) solid var(--color-border);
+  padding: var(--sp-1) var(--sp-2);
+  font-size: var(--fs-micro);
+  color: var(--color-ink);
+  width: max-content;
+  max-width: 240px;
+}
 
 .docs-toc { display: none; margin-bottom: var(--sp-5); }
 .docs-toc summary {

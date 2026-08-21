@@ -183,11 +183,15 @@ func (h *handlers) docPage(w http.ResponseWriter, r *http.Request) {
 		Version:     cmp.Or(deref(doc.Version), ""),
 	}
 	for _, d := range manifestDocs.Docs {
-		nav.Items = append(nav.Items, ui.DocsNavItem{
+		item := ui.DocsNavItem{
 			Title:  d.Title,
 			URL:    "/docs/" + projectSlug + "/" + d.Slug,
 			Active: d.Slug == docSlug,
-		})
+		}
+		if item.Active {
+			item.Sections = extractSections(doc.BodyHTML)
+		}
+		nav.Items = append(nav.Items, item)
 	}
 	h.render(w, r, http.StatusOK, ui.DocPage(doc, nav))
 }

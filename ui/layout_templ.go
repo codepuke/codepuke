@@ -42,7 +42,7 @@ func Layout(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"stylesheet\" href=\"/static/site.css\"><link rel=\"alternate\" type=\"application/rss+xml\" title=\"codepuke\" href=\"/rss.xml\"><script src=\"/static/site.js\" defer></script></head><body><header class=\"site-header\"><a class=\"site-name\" href=\"/\">codepuke</a><nav><a href=\"/archive\">articles</a> <a href=\"/projects\">projects</a> <a href=\"/docs\">docs</a> <a href=\"/rss.xml\">rss</a></nav></header><main class=\"site-main\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"stylesheet\" href=\"/static/site.css\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/favicon.svg\"><link rel=\"alternate\" type=\"application/rss+xml\" title=\"codepuke\" href=\"/rss.xml\"><script src=\"/static/site.js\" defer></script></head><body><header class=\"site-header\"><a class=\"site-name\" href=\"/\">codepuke</a><nav><a href=\"/archive\">articles</a> <a href=\"/projects\">projects</a> <a href=\"/rss.xml\">rss</a></nav></header><main class=\"site-main\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

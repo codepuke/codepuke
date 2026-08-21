@@ -34,7 +34,7 @@ func buildPolicy() *bluemonday.Policy {
 	p.AllowAttrs("id").Globally()
 	p.AllowAttrs("role").OnElements("a", "div", "ol", "li", "sup")
 
-	p.AllowAttrs("data-topic", "data-active").OnElements("code-tabs")
+	p.AllowAttrs("data-topic", "data-active", "data-default").OnElements("code-tabs")
 	p.AllowAttrs("data-lang", "hidden").OnElements("section")
 	p.AllowAttrs("data-overflow").OnElements("scroll-box")
 	p.AllowAttrs("tabindex").OnElements("pre")

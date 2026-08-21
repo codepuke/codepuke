@@ -13,15 +13,17 @@ import (
 
 // blockRenderers is the single registry of custom ::: block extensions.
 // Adding an extension means adding an entry here and nothing else.
-var blockRenderers = map[string]func(w util.BufWriter, p *Pipeline, args string) error{
+var blockRenderers = map[string]func(w util.BufWriter, p *Pipeline, d *directiveBlock) error{
 	"examples": renderExamplesBlock,
 }
 
-// directiveBlock is a single-line ":::name args" block.
+// directiveBlock is a single-line ":::name args" block. DefaultLang carries
+// the render call's WithExamplesDefault value.
 type directiveBlock struct {
 	ast.BaseBlock
-	Name string
-	Args string
+	Name        string
+	Args        string
+	DefaultLang string
 }
 
 var kindDirectiveBlock = ast.NewNodeKind("DirectiveBlock")
@@ -45,7 +47,8 @@ func (directiveParser) Open(parent ast.Node, reader text.Reader, pc parser.Conte
 		return nil, parser.NoChildren
 	}
 	reader.Advance(segment.Len() - 1)
-	return &directiveBlock{Name: string(m[1]), Args: string(m[2])}, parser.NoChildren
+	defaultLang, _ := pc.Get(defaultLangKey).(string)
+	return &directiveBlock{Name: string(m[1]), Args: string(m[2]), DefaultLang: defaultLang}, parser.NoChildren
 }
 
 func (directiveParser) Continue(node ast.Node, reader text.Reader, pc parser.Context) parser.State {
@@ -67,7 +70,7 @@ func renderDirective(w util.BufWriter, p *Pipeline, node ast.Node, entering bool
 	if !ok {
 		return ast.WalkStop, fmt.Errorf("unknown block directive %q", d.Name)
 	}
-	if err := render(w, p, d.Args); err != nil {
+	if err := render(w, p, d); err != nil {
 		return ast.WalkStop, err
 	}
 	return ast.WalkContinue, nil

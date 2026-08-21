@@ -54,11 +54,21 @@ type ArchiveYear struct {
 	Articles []store.ArticleSummary
 }
 
-// DocsNavItem is one entry of a project's docs navigation.
+// DocSection is one h2 of the active docs page, shown as a subdued anchor
+// link under its nav item.
+type DocSection struct {
+	ID    string
+	Label string // the 0x01-style chip text
+	Title string
+}
+
+// DocsNavItem is one entry of a project's docs navigation. Sections is
+// populated only on the active item.
 type DocsNavItem struct {
-	Title  string
-	URL    string
-	Active bool
+	Title    string
+	URL      string
+	Active   bool
+	Sections []DocSection
 }
 
 // DocsNavModel feeds the docs nav partial, which renders twice per page
