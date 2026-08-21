@@ -1,0 +1,180 @@
+{
+  "sources": [
+    {
+      "name": "gobspect",
+      "ref": "main",
+      "commit": "129def31e33ed84ffc2796fccd7f0ade640d2cb3",
+      "lang": "go",
+      "topics": [
+        "decode-struct",
+        "diff-values",
+        "encode-interface",
+        "encode-map",
+        "encode-nested-struct",
+        "encode-slice",
+        "encode-struct",
+        "encode-time",
+        "format-options",
+        "gobencoder-type",
+        "query-descent",
+        "query-get",
+        "redact-output",
+        "register-decoder",
+        "schema-extract",
+        "stream-multiple-values",
+        "stream-types",
+        "stream-values",
+        "to-json"
+      ],
+      "projects": [
+        {
+          "slug": "gobspect",
+          "docs": [
+            {
+              "slug": "overview",
+              "title": "Overview",
+              "file": "docs/gobspect/overview.md",
+              "source": "docs/00-overview.md"
+            },
+            {
+              "slug": "api",
+              "title": "API Guide",
+              "file": "docs/gobspect/api.md",
+              "source": "docs/01-api.md"
+            },
+            {
+              "slug": "opaque-types",
+              "title": "Opaque Type Decoding",
+              "file": "docs/gobspect/opaque-types.md",
+              "source": "docs/02-opaque-types.md"
+            },
+            {
+              "slug": "wire-format",
+              "title": "Gob Wire Format Reference",
+              "file": "docs/gobspect/wire-format.md",
+              "source": "docs/03-wire-format.md"
+            },
+            {
+              "slug": "architecture",
+              "title": "How gobspect Works",
+              "file": "docs/gobspect/architecture.md",
+              "source": "docs/04-architecture.md"
+            }
+          ]
+        },
+        {
+          "slug": "gq",
+          "docs": [
+            {
+              "slug": "overview",
+              "title": "\"gq: a jq for gob streams\"",
+              "file": "docs/gq/overview.md",
+              "source": "cmd/gq/docs/00-overview.md"
+            },
+            {
+              "slug": "query-language",
+              "title": "Query language",
+              "file": "docs/gq/query-language.md",
+              "source": "cmd/gq/docs/01-query-language.md"
+            },
+            {
+              "slug": "output-formats",
+              "title": "Output formats",
+              "file": "docs/gq/output-formats.md",
+              "source": "cmd/gq/docs/02-output-formats.md"
+            },
+            {
+              "slug": "selecting-sorting-paging",
+              "title": "Selecting, sorting, and paging",
+              "file": "docs/gq/selecting-sorting-paging.md",
+              "source": "cmd/gq/docs/03-selecting-sorting-paging.md"
+            },
+            {
+              "slug": "schema-stats-aggregation-diff",
+              "title": "\"Schema, stats, aggregation, diff\"",
+              "file": "docs/gq/schema-stats-aggregation-diff.md",
+              "source": "cmd/gq/docs/04-schema-stats-aggregation-diff.md"
+            },
+            {
+              "slug": "reference",
+              "title": "\"Flag reference\"",
+              "file": "docs/gq/reference.md",
+              "source": "cmd/gq/docs/05-reference.md"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gobspect-mcp",
+      "ref": "main",
+      "commit": "8b0afafe2fedf42a5ae7d73ab8cbe61c7c9818c0",
+      "lang": "go",
+      "topics": [],
+      "projects": [
+        {
+          "slug": "gobspect-mcp",
+          "docs": [
+            {
+              "slug": "overview",
+              "title": "Overview",
+              "file": "docs/gobspect-mcp/overview.md",
+              "source": "docs/00-overview.md"
+            },
+            {
+              "slug": "setup",
+              "title": "Setup",
+              "file": "docs/gobspect-mcp/setup.md",
+              "source": "docs/01-setup.md"
+            },
+            {
+              "slug": "tools",
+              "title": "Tools and Queries",
+              "file": "docs/gobspect-mcp/tools.md",
+              "source": "docs/02-tools.md"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gobts",
+      "ref": "main",
+      "commit": "bc04ab1f98aa1b33213a433ddafa91cad50ea934",
+      "lang": "typescript",
+      "topics": [],
+      "projects": [
+        {
+          "slug": "gobts",
+          "docs": []
+        }
+      ]
+    },
+    {
+      "name": "pygob",
+      "ref": "main",
+      "commit": "38c7f4911ecefed3ec31dda924a9d4fdc72ef53c",
+      "lang": "python",
+      "topics": [],
+      "projects": [
+        {
+          "slug": "pygob",
+          "docs": []
+        }
+      ]
+    },
+    {
+      "name": "gobdotnet",
+      "ref": "main",
+      "commit": "971856a927b71c6fc427ab92ba55f536593a70ac",
+      "lang": "csharp",
+      "topics": [],
+      "projects": [
+        {
+          "slug": "gobdotnet",
+          "docs": []
+        }
+      ]
+    }
+  ]
+}

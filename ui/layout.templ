@@ -1,0 +1,33 @@
+package ui
+
+templ Layout(title string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>{ title }</title>
+			<link rel="stylesheet" href="/static/site.css"/>
+			<link rel="alternate" type="application/rss+xml" title="codepuke" href="/rss.xml"/>
+			<script src="/static/site.js" defer></script>
+		</head>
+		<body>
+			<header class="site-header">
+				<a class="site-name" href="/">codepuke</a>
+				<nav>
+					<a href="/archive">articles</a>
+					<a href="/projects">projects</a>
+					<a href="/docs">docs</a>
+					<a href="/rss.xml">rss</a>
+				</nav>
+			</header>
+			<main class="site-main">
+				{ children... }
+			</main>
+			<footer class="site-footer">
+				<span>codepuke.com</span>
+				<span>EOF</span>
+			</footer>
+		</body>
+	</html>
+}

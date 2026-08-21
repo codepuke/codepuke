@@ -1,0 +1,152 @@
+package ui
+
+import (
+	"fmt"
+
+	"github.com/codepuke/codepuke/internal/store"
+)
+
+templ Home(articles []store.ArticleSummary, groups []FamilyGroup) {
+	@Layout("codepuke") {
+		<div class="aside-shell">
+			<div>
+				<div class="home-intro">
+					<h1 class="wordmark">codepuke</h1>
+					<div class="kicker">{ "records // projects // documentation" }</div>
+				</div>
+				<nav class="jump-links">
+					<a href="#records">records</a>
+					<a href="#projects">projects</a>
+				</nav>
+				<section id="records">
+					<div class="section-head">
+						<h2>records</h2>
+						<span class="count">{ fmt.Sprintf("%d records", len(articles)) }</span>
+					</div>
+					<div class="record-rows">
+						for i, a := range articles {
+							@RecordRow(i, a)
+						}
+					</div>
+				</section>
+			</div>
+			<aside id="projects">
+				<div class="section-head"><h2>projects</h2></div>
+				for _, g := range groups {
+					@FamilyLine(g.Family)
+					<ul class="aside-projects">
+						for _, c := range g.Cards {
+							<li>
+								<a href={ templ.URL(c.OpenURL) }>{ c.Project.Name }</a>
+								<span class="desc">{ c.Project.Description }</span>
+							</li>
+						}
+					</ul>
+				}
+			</aside>
+		</div>
+	}
+}
+
+templ ArticlePage(a store.Article) {
+	@Layout(a.Title + " // codepuke") {
+		<article class="prose">
+			<div class="kicker article-kicker">{ "article // " + Date(a.PublishedAt) + " // " + a.Author }</div>
+			<h1 class="article-title">{ a.Title }</h1>
+			<div class="prose-body">
+				@templ.Raw(a.BodyHTML)
+			</div>
+			if len(a.TagSlugs) > 0 {
+				<div class="article-tags">
+					@TagChips(a.TagSlugs, a.TagNames)
+				</div>
+			}
+		</article>
+	}
+}
+
+templ TagPage(category store.Category, articles []store.ArticleSummary) {
+	@Layout(category.Name + " // codepuke") {
+		<div class="kicker">tag</div>
+		<h1 class="index-title">{ category.Name }</h1>
+		<div class="record-rows">
+			for i, a := range articles {
+				@RecordRow(i, a)
+			}
+		</div>
+	}
+}
+
+templ ArchivePage(years []ArchiveYear) {
+	@Layout("archive // codepuke") {
+		<div class="kicker">archive</div>
+		<h1 class="index-title">archive</h1>
+		<nav class="seek-row" aria-label="seek">
+			for _, y := range years {
+				<a href={ templ.URL(fmt.Sprintf("#y%d", y.Year)) }>{ fmt.Sprintf("%d", y.Year) }</a>
+			}
+		</nav>
+		for _, y := range years {
+			<div class="year-head" id={ fmt.Sprintf("y%d", y.Year) }>
+				<h2>{ fmt.Sprintf("%d", y.Year) }</h2>
+				<span class="count">{ fmt.Sprintf("%d records", len(y.Articles)) }</span>
+			</div>
+			for _, a := range y.Articles {
+				@ArchiveRow(a)
+			}
+		}
+	}
+}
+
+templ ProjectsPage(groups []FamilyGroup) {
+	@Layout("projects // codepuke") {
+		<div class="kicker">projects</div>
+		<h1 class="index-title">projects</h1>
+		for _, g := range groups {
+			@FamilyHead(g.Family, len(g.Cards))
+			<div class="card-grid">
+				for _, c := range g.Cards {
+					@Card(c)
+				}
+			</div>
+		}
+	}
+}
+
+templ DocPage(doc store.Doc, nav DocsNavModel) {
+	@Layout(doc.Title + " // " + doc.ProjectName + " // codepuke") {
+		<div class="docs-shell">
+			<div class="docs-nav-column">
+				@DocsNav(nav)
+			</div>
+			<div class="docs-content">
+				<details class="docs-toc">
+					<summary>
+						{ "contents // " + nav.ProjectName }
+						if nav.Version != "" {
+							<span class="ver">{ nav.Version }</span>
+						}
+					</summary>
+					@DocsNav(nav)
+				</details>
+				<article class="prose docs-prose">
+					<div class="kicker article-kicker">{ "docs // " + nav.ProjectName }</div>
+					<h1 class="article-title">{ doc.Title }</h1>
+					<div class="prose-body">
+						@templ.Raw(doc.BodyHTML)
+					</div>
+				</article>
+			</div>
+		</div>
+	}
+}
+
+templ NotFoundPage() {
+	@Layout("not found // codepuke") {
+		<div class="notfound">
+			<div class="kicker">{ "0x194 // record does not exist" }</div>
+			<h1>NOT FOUND</h1>
+			<p><a href="/">seek to 0x0000</a></p>
+		</div>
+	}
+}

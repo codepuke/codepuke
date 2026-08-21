@@ -1,0 +1,10 @@
+.DS_Store
+
+# built binaries
+/codepuke
+/sync
+*.test
+
+# local environment
+.env
+.env.*

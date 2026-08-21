@@ -1,0 +1,92 @@
+package ui
+
+import (
+	"fmt"
+
+	"github.com/codepuke/codepuke/internal/store"
+)
+
+templ RecordRow(index int, a store.ArticleSummary) {
+	<div class="record-row">
+		<span class="offset">{ Offset(index) }</span>
+		<span class="date">{ Date(a.PublishedAt) }</span>
+		<div class="body">
+			<div class="title"><a href={ templ.URL("/articles/" + a.Slug) }>{ a.Title }</a></div>
+			<div class="meta">
+				<span>{ a.Author + " //" }</span>
+				@TagChips(a.TagSlugs, a.TagNames)
+			</div>
+		</div>
+	</div>
+}
+
+templ TagChips(slugs, names []string) {
+	for i, slug := range slugs {
+		<a class="tag-chip" href={ templ.URL("/tags/" + slug) }>{ names[i] }</a>
+	}
+}
+
+templ ArchiveRow(a store.ArticleSummary) {
+	<div class="archive-row">
+		<span class="date">{ Date(a.PublishedAt) }</span>
+		<span class="title"><a href={ templ.URL("/articles/" + a.Slug) }>{ a.Title }</a></span>
+		<span class="tags">
+			for i, name := range a.TagNames {
+				if i > 0 {
+					{ ", " }
+				}
+				{ name }
+			}
+		</span>
+	</div>
+}
+
+templ FamilyHead(f store.Family, projectCount int) {
+	<div class="family-head">
+		<div>
+			<span class="family-name">{ f.Name }</span>
+			<span class="family-desc">{ "// " + f.Descriptor }</span>
+		</div>
+		<span class="count">{ fmt.Sprintf("%d projects", projectCount) }</span>
+	</div>
+}
+
+templ FamilyLine(f store.Family) {
+	<div class="family-line">
+		<span class="family-name">{ f.Name }</span>
+		<span class="family-desc">{ "// " + f.Descriptor }</span>
+	</div>
+}
+
+templ Card(c ProjectCard) {
+	<div class="card">
+		<div class="card-name">{ c.Project.Name }</div>
+		<div class="card-desc">{ c.Project.Description }</div>
+		<div class="card-foot">
+			if c.Project.Version != nil {
+				<span class="card-ver">{ *c.Project.Version }</span>
+			}
+			<a class="card-open" href={ templ.URL(c.OpenURL) }>open</a>
+		</div>
+	</div>
+}
+
+// DocsNav is rendered twice per docs page: once in the sidebar column, once
+// inside the phone contents bar. CSS shows exactly one.
+templ DocsNav(nav DocsNavModel) {
+	<nav class="docs-nav" aria-label="documentation">
+		<div class="docs-project">
+			{ nav.ProjectName }
+			if nav.Version != "" {
+				<span class="ver">{ nav.Version }</span>
+			}
+		</div>
+		for i, item := range nav.Items {
+			if item.Active {
+				<a class="nav-item on" href={ templ.URL(item.URL) } aria-current="page"><span>{ NavNum(i) }</span>{ item.Title }</a>
+			} else {
+				<a class="nav-item" href={ templ.URL(item.URL) }><span>{ NavNum(i) }</span>{ item.Title }</a>
+			}
+		}
+	</nav>
+}

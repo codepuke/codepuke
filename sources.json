@@ -1,0 +1,50 @@
+{
+  "sources": [
+    {
+      "name": "gobspect",
+      "path": "../gobspect",
+      "ref": "main",
+      "lang": "go",
+      "projects": [
+        {"slug": "gobspect", "docs": "docs"},
+        {"slug": "gq", "docs": "cmd/gq/docs"}
+      ]
+    },
+    {
+      "name": "gobspect-mcp",
+      "path": "../gobspect-mcp",
+      "ref": "main",
+      "lang": "go",
+      "projects": [
+        {"slug": "gobspect-mcp", "docs": "docs"}
+      ]
+    },
+    {
+      "name": "gobts",
+      "path": "../gobts",
+      "ref": "main",
+      "lang": "typescript",
+      "projects": [
+        {"slug": "gobts", "docs": "docs"}
+      ]
+    },
+    {
+      "name": "pygob",
+      "path": "../pygob",
+      "ref": "main",
+      "lang": "python",
+      "projects": [
+        {"slug": "pygob", "docs": "docs"}
+      ]
+    },
+    {
+      "name": "gobdotnet",
+      "path": "../gobdotnet",
+      "ref": "main",
+      "lang": "csharp",
+      "projects": [
+        {"slug": "gobdotnet", "docs": "docs"}
+      ]
+    }
+  ]
+}
