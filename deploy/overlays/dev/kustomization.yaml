@@ -1,0 +1,68 @@
+# Dev overlay for dev.codepuke.com: a preview environment that tracks main.
+# The codepuke-dev ArgoCD Application sources this path from codepuke@main;
+# CI rewrites images[0].newTag to sha-<fullsha> on every green push to main.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: codepuke-dev
+
+# environment=dev on object metadata for Loki stream separation; the pod
+# template copy comes from the explicit patch below, not includeTemplates.
+labels:
+  - pairs:
+      environment: dev
+    includeSelectors: false
+    includeTemplates: false
+
+resources:
+  - ../../base
+  # Dev secrets from OpenBao (ESO) live here because this overlay deploys
+  # straight from codepuke@main; prod's equivalents live in the homelab repo.
+  - externalsecrets.yaml
+
+images:
+  - name: ghcr.io/codepuke/codepuke
+    newTag: dev
+
+patches:
+  # Serve dev.codepuke.com only; drop the prod www->apex redirect middleware.
+  - target:
+      kind: Ingress
+      name: codepuke
+    patch: |-
+      - op: replace
+        path: /spec/rules
+        value:
+          - host: dev.codepuke.com
+            http:
+              paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: codepuke
+                      port:
+                        name: http
+      - op: remove
+        path: /metadata/annotations/traefik.ingress.kubernetes.io~1router.middlewares
+
+  # Dev-facing base URL; the rest of codepuke-env is inherited.
+  - target:
+      kind: ConfigMap
+      name: codepuke-env
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: codepuke-env
+      data:
+        BASE_URL: https://dev.codepuke.com
+
+  # environment=dev on the pod itself; Alloy promotes this to a Loki label.
+  - target:
+      kind: Deployment
+      name: codepuke
+    patch: |-
+      - op: add
+        path: /spec/template/metadata/labels/environment
+        value: dev

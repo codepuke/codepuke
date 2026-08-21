@@ -1,0 +1,32 @@
+# Public via the Cloudflare tunnel: no tls block (edge TLS), plain Ingress
+# to Traefik. The tunnel itself is a catch-all to Traefik; hostname routing
+# happens here.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: codepuke
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: codepuke-redirect-www-to-apex@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: codepuke.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: codepuke
+                port:
+                  name: http
+    - host: www.codepuke.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: codepuke
+                port:
+                  name: http

@@ -33,9 +33,38 @@ func run() error {
 	switch cmd {
 	case "serve":
 		return serve()
+	case "sync-db":
+		return syncDBCmd()
 	default:
-		return fmt.Errorf("unknown command %q (want: serve)", cmd)
+		return fmt.Errorf("unknown command %q (want: serve, sync-db)", cmd)
 	}
+}
+
+// syncDBCmd runs one standalone docs sync against the configured database.
+func syncDBCmd() error {
+	cfg, err := config.Parse(os.LookupEnv)
+	if err != nil {
+		return err
+	}
+	slog.SetDefault(cfg.Logger(os.Stdout))
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	if err := store.RunMigrations(ctx, cfg.DatabaseURL); err != nil {
+		return err
+	}
+	st, err := store.New(ctx, cfg.DatabaseURL)
+	if err != nil {
+		return err
+	}
+	defer st.Close()
+
+	pipeline, err := buildPipeline(ctx, cfg)
+	if err != nil {
+		return err
+	}
+	return syncDB(ctx, st, pipeline)
 }
 
 func serve() error {
@@ -58,6 +87,14 @@ func serve() error {
 		return err
 	}
 	defer st.Close()
+
+	pipeline, err := buildPipeline(ctx, cfg)
+	if err != nil {
+		return err
+	}
+	if err := syncDB(ctx, st, pipeline); err != nil {
+		return err
+	}
 
 	handler, err := web.New(web.Deps{Store: st, Content: contentfs.FS, BaseURL: cfg.BaseURL})
 	if err != nil {

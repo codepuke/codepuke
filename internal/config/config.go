@@ -23,6 +23,9 @@ type Config struct {
 	// BaseURL is the site's public origin, from BASE_URL; absolute links
 	// (the RSS feed) derive from it.
 	BaseURL string
+	// MermaidURL is the kroki-mermaid sidecar base URL, from MERMAID_URL.
+	// Empty means no renderer: diagrams stay highlighted code blocks.
+	MermaidURL string
 }
 
 // Parse builds a Config by reading through lookup, typically os.LookupEnv.
@@ -38,6 +41,7 @@ func Parse(lookup func(string) (string, bool)) (Config, error) {
 		DatabaseURL: env("DATABASE_URL"),
 		LogFormat:   cmp.Or(env("LOG_FORMAT"), "text"),
 		BaseURL:     strings.TrimRight(cmp.Or(env("BASE_URL"), "https://codepuke.com"), "/"),
+		MermaidURL:  env("MERMAID_URL"),
 	}
 
 	if cfg.DatabaseURL == "" {

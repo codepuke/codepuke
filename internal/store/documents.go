@@ -146,6 +146,45 @@ func (s *Store) GetDoc(ctx context.Context, projectSlug, docSlug string) (Doc, e
 	return doc, err
 }
 
+// UpsertDoc writes one synced docs page, keyed by project slug and doc slug.
+func (s *Store) UpsertDoc(ctx context.Context, projectSlug, slug, title, bodyMD, bodyHTML string, renderVersion int) error {
+	tag, err := s.pool.Exec(ctx, `
+		insert into documents (kind, project_id, slug, title, author, body_md, body_html, render_version, published_at)
+		select 'doc', p.id, $2, $3, 'sync', $4, $5, $6, now()
+		from projects p
+		where p.slug = $1
+		on conflict (kind, project_id, slug, version) do update
+		set title          = excluded.title,
+		    body_md        = excluded.body_md,
+		    body_html      = excluded.body_html,
+		    render_version = excluded.render_version,
+		    updated_at     = now()`,
+		projectSlug, slug, title, bodyMD, bodyHTML, renderVersion)
+	if err != nil {
+		return fmt.Errorf("upsert doc %s/%s: %w", projectSlug, slug, err)
+	}
+	if tag.RowsAffected() == 0 {
+		return fmt.Errorf("upsert doc %s/%s: unknown project", projectSlug, slug)
+	}
+	return nil
+}
+
+// PruneDocs deletes docs rows absent from keep, whose entries are
+// "projectSlug/docSlug". Rows for renamed or removed pages go away with the
+// sync that dropped them.
+func (s *Store) PruneDocs(ctx context.Context, keep []string) (int64, error) {
+	tag, err := s.pool.Exec(ctx, `
+		delete from documents d
+		using projects p
+		where d.project_id = p.id
+		  and d.kind = 'doc'
+		  and not (p.slug || '/' || d.slug = any($1))`, keep)
+	if err != nil {
+		return 0, fmt.Errorf("prune docs: %w", err)
+	}
+	return tag.RowsAffected(), nil
+}
+
 // ListProjects returns every project ordered by name.
 func (s *Store) ListProjects(ctx context.Context) ([]Project, error) {
 	rows, err := s.pool.Query(ctx, `

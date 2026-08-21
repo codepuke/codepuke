@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codepuke
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: codepuke
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: codepuke
+    spec:
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      containers:
+        - name: app
+          image: ghcr.io/codepuke/codepuke:placeholder
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: codepuke-env
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: codepuke-db-credentials
+                  key: uri
+          # Boot runs migrations and the docs sync (which may call the mermaid
+          # sidecar) before listening; the startup probe allows for that.
+          startupProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            failureThreshold: 60
+            periodSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 2
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+        # kroki-mermaid renders ```mermaid fences to SVG. Called only during
+        # the boot-time docs sync and at publish time, never on a request
+        # path. Runs as the image's own uid 1001 (named user "kroki", which
+        # kubelet cannot verify against runAsNonRoot without the number).
+        - name: mermaid
+          image: yuzutech/kroki-mermaid:0.32.1
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: mermaid
+              containerPort: 8002
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: tmp
+          emptyDir: {}

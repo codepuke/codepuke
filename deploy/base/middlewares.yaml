@@ -1,0 +1,9 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-www-to-apex
+spec:
+  redirectRegex:
+    regex: "^https?://www\\.codepuke\\.com/(.*)"
+    replacement: "https://codepuke.com/${1}"
+    permanent: true

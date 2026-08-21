@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: codepuke
+
+# Stamp app.kubernetes.io/name onto every object so log/metric pipelines can
+# select codepuke uniformly. Selectors and the pod template carry their own
+# hand-written copies.
+labels:
+  - pairs:
+      app.kubernetes.io/name: codepuke
+    includeSelectors: false
+    includeTemplates: false
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+  - middlewares.yaml
+  - ingress.yaml
+
+images:
+  - name: ghcr.io/codepuke/codepuke
+    newTag: placeholder
