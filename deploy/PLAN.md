@@ -165,8 +165,11 @@ committed; only the client secret is secret.
 
 Items 1 through 3 landed with stage 5 (homelab commit "postgres, argocd,
 homepage: add the codepuke dev preview"), along with the homepage entry and
-the GitHub webhook. Only the prod equivalents (item 4) remain, for cutover
-at stage 6.
+the GitHub webhook. Item 4 landed with stage 6 (homelab commit "postgres,
+argocd, homepage: add codepuke production"): role and database `codepuke`,
+prod ExternalSecrets, `workloads/codepuke/` pinned at v0.1.0, and the
+codepuke Application. Every homelab change in this list is done; the only
+by-hand remainder is the Authentik application setup above.
 
 1. `infrastructure/postgres/cluster.yaml`: add to `managed.roles`:
 
