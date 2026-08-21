@@ -161,10 +161,12 @@ committed; only the client secret is secret.
 - Prod release is two commits: tag here, then bump `newTag` and `?ref=` in
   `homelab/workloads/codepuke/kustomization.yaml`.
 
-## Required homelab changes (Dan makes these)
+## Required homelab changes
 
-Only items 1 through 3 block stage 5 (dev deploy); the rest can land with
-prod cutover at stage 6.
+Items 1 through 3 landed with stage 5 (homelab commit "postgres, argocd,
+homepage: add the codepuke dev preview"), along with the homepage entry and
+the GitHub webhook. Only the prod equivalents (item 4) remain, for cutover
+at stage 6.
 
 1. `infrastructure/postgres/cluster.yaml`: add to `managed.roles`:
 
