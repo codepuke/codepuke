@@ -1,0 +1,22 @@
+var buf bytes.Buffer
+enc := gob.NewEncoder(&buf)
+
+// The encoder sends Point's type definition once, ahead of the first
+// value; later values reuse it.
+if err := enc.Encode(Point{X: 3, Y: 4}); err != nil {
+	log.Fatal(err)
+}
+if err := enc.Encode(Point{X: 5, Y: 6}); err != nil {
+	log.Fatal(err)
+}
+
+dec := gob.NewDecoder(&buf)
+var first, second Point
+if err := dec.Decode(&first); err != nil {
+	log.Fatal(err)
+}
+if err := dec.Decode(&second); err != nil {
+	log.Fatal(err)
+}
+fmt.Println(first.X, first.Y)
+fmt.Println(second.X, second.Y)

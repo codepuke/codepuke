@@ -3,19 +3,20 @@
     {
       "name": "gobspect",
       "ref": "main",
-      "commit": "129def31e33ed84ffc2796fccd7f0ade640d2cb3",
+      "commit": "56569a52a2ef336bb8aa9f25704f365a9b551ef6",
       "lang": "go",
       "topics": [
         "decode-struct",
         "diff-values",
-        "encode-interface",
         "encode-map",
-        "encode-nested-struct",
+        "encode-scalars",
         "encode-slice",
         "encode-struct",
-        "encode-time",
+        "end-of-stream",
         "format-options",
         "gobencoder-type",
+        "interface-values",
+        "nested-struct",
         "query-descent",
         "query-get",
         "redact-output",
@@ -24,7 +25,9 @@
         "stream-multiple-values",
         "stream-types",
         "stream-values",
-        "to-json"
+        "time-values",
+        "to-json",
+        "zero-fields-omitted"
       ],
       "projects": [
         {
@@ -140,39 +143,235 @@
     {
       "name": "gobts",
       "ref": "main",
-      "commit": "bc04ab1f98aa1b33213a433ddafa91cad50ea934",
+      "commit": "1c2c59616b7d6d629d71b31132e8808f9d05c16a",
       "lang": "typescript",
-      "topics": [],
+      "topics": [
+        "custom-marshaler",
+        "decode-struct",
+        "define-schema",
+        "dynamic-field-access",
+        "encode-map",
+        "encode-scalars",
+        "encode-slice",
+        "encode-struct",
+        "end-of-stream",
+        "interface-values",
+        "nested-struct",
+        "schema-type-inference",
+        "semantic-type",
+        "stream-multiple-values",
+        "time-values",
+        "uuid-values",
+        "zero-fields-omitted"
+      ],
       "projects": [
         {
           "slug": "gobts",
-          "docs": []
+          "docs": [
+            {
+              "slug": "overview",
+              "title": "Overview",
+              "file": "docs/gobts/overview.md",
+              "source": "docs/00-overview.md"
+            },
+            {
+              "slug": "schemas",
+              "title": "Schemas and Types",
+              "file": "docs/gobts/schemas.md",
+              "source": "docs/01-schemas.md"
+            },
+            {
+              "slug": "encoding-decoding",
+              "title": "Encoding and Decoding",
+              "file": "docs/gobts/encoding-decoding.md",
+              "source": "docs/02-encoding-decoding.md"
+            },
+            {
+              "slug": "codecs",
+              "title": "Codecs",
+              "file": "docs/gobts/codecs.md",
+              "source": "docs/03-codecs.md"
+            },
+            {
+              "slug": "go-interop",
+              "title": "Go Interoperability",
+              "file": "docs/gobts/go-interop.md",
+              "source": "docs/04-go-interop.md"
+            },
+            {
+              "slug": "limitations",
+              "title": "Limitations and Performance",
+              "file": "docs/gobts/limitations.md",
+              "source": "docs/05-limitations.md"
+            }
+          ]
         }
       ]
     },
     {
       "name": "pygob",
       "ref": "main",
-      "commit": "38c7f4911ecefed3ec31dda924a9d4fdc72ef53c",
+      "commit": "62cde13f95ece8bc21015dd5b23a7885b969b592",
       "lang": "python",
-      "topics": [],
+      "topics": [
+        "custom-marshaler",
+        "decode-struct",
+        "empty-collections",
+        "encode-array",
+        "encode-map",
+        "encode-scalars",
+        "encode-slice",
+        "encode-struct",
+        "end-of-stream",
+        "interface-values",
+        "nested-struct",
+        "round-trip",
+        "schema-type-inference",
+        "semantic-type",
+        "slice-of-structs",
+        "stream-multiple-values",
+        "time-values",
+        "uuid-values",
+        "zero-fields-omitted"
+      ],
       "projects": [
         {
           "slug": "pygob",
-          "docs": []
+          "docs": [
+            {
+              "slug": "overview",
+              "title": "Overview",
+              "file": "docs/pygob/overview.md",
+              "source": "docs/00-overview.md"
+            },
+            {
+              "slug": "installation",
+              "title": "Installation",
+              "file": "docs/pygob/installation.md",
+              "source": "docs/01-installation.md"
+            },
+            {
+              "slug": "encoding",
+              "title": "Encoding Values",
+              "file": "docs/pygob/encoding.md",
+              "source": "docs/02-encoding.md"
+            },
+            {
+              "slug": "decoding",
+              "title": "Decoding Values",
+              "file": "docs/pygob/decoding.md",
+              "source": "docs/03-decoding.md"
+            },
+            {
+              "slug": "collections",
+              "title": "Collections",
+              "file": "docs/pygob/collections.md",
+              "source": "docs/04-collections.md"
+            },
+            {
+              "slug": "streams",
+              "title": "Streams",
+              "file": "docs/pygob/streams.md",
+              "source": "docs/05-streams.md"
+            },
+            {
+              "slug": "interfaces",
+              "title": "Interface Values",
+              "file": "docs/pygob/interfaces.md",
+              "source": "docs/06-interfaces.md"
+            },
+            {
+              "slug": "custom-types",
+              "title": "Custom \u0026 Named Types",
+              "file": "docs/pygob/custom-types.md",
+              "source": "docs/07-custom-types.md"
+            },
+            {
+              "slug": "type-mapping",
+              "title": "Type Mapping \u0026 Limitations",
+              "file": "docs/pygob/type-mapping.md",
+              "source": "docs/08-type-mapping.md"
+            }
+          ]
         }
       ]
     },
     {
       "name": "gobdotnet",
       "ref": "main",
-      "commit": "971856a927b71c6fc427ab92ba55f536593a70ac",
+      "commit": "f9638b69789c3dc1dae7d8322d538cc52cc114a1",
       "lang": "csharp",
-      "topics": [],
+      "topics": [
+        "custom-marshaler",
+        "decode-struct",
+        "define-schema",
+        "encode-map",
+        "encode-scalars",
+        "encode-slice",
+        "encode-struct",
+        "end-of-stream",
+        "interface-values",
+        "nested-struct",
+        "semantic-type",
+        "source-generator",
+        "stream-multiple-values",
+        "time-values",
+        "uuid-values",
+        "zero-fields-omitted"
+      ],
       "projects": [
         {
           "slug": "gobdotnet",
-          "docs": []
+          "docs": [
+            {
+              "slug": "overview",
+              "title": "Overview",
+              "file": "docs/gobdotnet/overview.md",
+              "source": "docs/00-overview.md"
+            },
+            {
+              "slug": "installation",
+              "title": "Installation",
+              "file": "docs/gobdotnet/installation.md",
+              "source": "docs/01-installation.md"
+            },
+            {
+              "slug": "schemas",
+              "title": "Schemas",
+              "file": "docs/gobdotnet/schemas.md",
+              "source": "docs/02-schemas.md"
+            },
+            {
+              "slug": "encoding",
+              "title": "Encoding",
+              "file": "docs/gobdotnet/encoding.md",
+              "source": "docs/03-encoding.md"
+            },
+            {
+              "slug": "decoding",
+              "title": "Decoding",
+              "file": "docs/gobdotnet/decoding.md",
+              "source": "docs/04-decoding.md"
+            },
+            {
+              "slug": "codecs",
+              "title": "Codecs",
+              "file": "docs/gobdotnet/codecs.md",
+              "source": "docs/05-codecs.md"
+            },
+            {
+              "slug": "source-generator",
+              "title": "Source Generator",
+              "file": "docs/gobdotnet/source-generator.md",
+              "source": "docs/06-source-generator.md"
+            },
+            {
+              "slug": "wire-format",
+              "title": "Wire Format Notes",
+              "file": "docs/gobdotnet/wire-format.md",
+              "source": "docs/07-wire-format.md"
+            }
+          ]
         }
       ]
     }

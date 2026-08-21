@@ -91,7 +91,7 @@ func TestSync(t *testing.T) {
 	require.NoError(t, run(sourcesPath, out))
 
 	t.Run("snippets extracted and dedented", func(t *testing.T) {
-		goCode, err := os.ReadFile(filepath.Join(out, "examples", "encode-struct", "go.go"))
+		goCode, err := os.ReadFile(filepath.Join(out, "examples", "encode-struct", "go.txt"))
 		require.NoError(t, err)
 		assert.Equal(t, "enc := gob.NewEncoder(&buf)\nenc.Encode(Point{X: 3, Y: 4})\n", string(goCode))
 
@@ -172,7 +172,7 @@ func TestSyncRefPinning(t *testing.T) {
 	out := filepath.Join(base, "content")
 	require.NoError(t, run(sourcesPath, out))
 
-	_, err := os.Stat(filepath.Join(out, "examples", "encode-struct", "go.go"))
+	_, err := os.Stat(filepath.Join(out, "examples", "encode-struct", "go.txt"))
 	assert.NoError(t, err, "content at the pinned tag is synced")
 	_, err = os.Stat(filepath.Join(out, "examples", "other"))
 	assert.True(t, os.IsNotExist(err), "content newer than the pinned tag is not")

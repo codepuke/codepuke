@@ -34,16 +34,21 @@ type projectSpec struct {
 	Docs string `json:"docs"`
 }
 
-// langInfo maps a source language to its line-comment token and the file
-// extension both scanned for and written.
+// langInfo maps a source language to its line-comment token, the extension
+// scanned in the source repo, and the extension written into content/.
+// Go fragments are written as .txt: with a .go extension every topic
+// directory would look like a broken package to go test ./... and gofmt,
+// since snippets carry no package clause. The site derives the language
+// from the filename stem, never the extension.
 var langInfo = map[string]struct {
 	CommentPrefix string
-	Ext           string
+	ScanExt       string
+	OutExt        string
 }{
-	"go":         {"//", ".go"},
-	"typescript": {"//", ".ts"},
-	"python":     {"#", ".py"},
-	"csharp":     {"//", ".cs"},
+	"go":         {"//", ".go", ".txt"},
+	"typescript": {"//", ".ts", ".ts"},
+	"python":     {"#", ".py", ".py"},
+	"csharp":     {"//", ".cs", ".cs"},
 }
 
 var docPrefixRe = regexp.MustCompile(`^\d+[-_]`)
@@ -102,7 +107,7 @@ func run(sourcesPath, outDir string) error {
 		var pages []docPage
 
 		err = forEachFile(repoPath, commit, func(name string, data []byte) error {
-			if strings.HasSuffix(name, info.Ext) {
+			if strings.HasSuffix(name, info.ScanExt) {
 				snippets, err := extractSnippets(data, info.CommentPrefix)
 				if err != nil {
 					return fmt.Errorf("%s: %s: %w", src.Name, name, err)
@@ -114,7 +119,7 @@ func run(sourcesPath, outDir string) error {
 					}
 					seenVariant[key] = src.Name
 					ms.Topics = append(ms.Topics, sn.Topic)
-					snippetFiles[path.Join("examples", sn.Topic, src.Lang+info.Ext)] = sn.Code
+					snippetFiles[path.Join("examples", sn.Topic, src.Lang+info.OutExt)] = sn.Code
 				}
 			}
 

@@ -1,15 +1,16 @@
 var buf bytes.Buffer
 enc := gob.NewEncoder(&buf)
-for _, p := range []Point{{1, 2}, {3, 4}, {5, 6}} {
+for _, p := range []Point{{3, 4}, {5, 6}} {
 	if err := enc.Encode(p); err != nil {
 		log.Fatal(err)
 	}
 }
 
+// Decode until the stream runs out; io.EOF is the normal end signal.
 dec := gob.NewDecoder(&buf)
 for {
 	var p Point
-	if err := dec.Decode(&p); err == io.EOF {
+	if err := dec.Decode(&p); errors.Is(err, io.EOF) {
 		break
 	} else if err != nil {
 		log.Fatal(err)

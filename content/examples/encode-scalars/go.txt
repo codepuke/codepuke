@@ -1,0 +1,30 @@
+var buf bytes.Buffer
+enc := gob.NewEncoder(&buf)
+
+// Every scalar kind encodes the same way: hand the value to Encode.
+if err := enc.Encode(42); err != nil {
+	log.Fatal(err)
+}
+if err := enc.Encode("hello"); err != nil {
+	log.Fatal(err)
+}
+if err := enc.Encode(true); err != nil {
+	log.Fatal(err)
+}
+
+dec := gob.NewDecoder(&buf)
+var (
+	n  int
+	s  string
+	ok bool
+)
+if err := dec.Decode(&n); err != nil {
+	log.Fatal(err)
+}
+if err := dec.Decode(&s); err != nil {
+	log.Fatal(err)
+}
+if err := dec.Decode(&ok); err != nil {
+	log.Fatal(err)
+}
+fmt.Println(n, s, ok)

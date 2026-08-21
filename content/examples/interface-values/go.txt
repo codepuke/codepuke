@@ -1,0 +1,20 @@
+type Box struct {
+	Value any
+}
+
+// Register the concrete type under an explicit name so both sides of
+// the wire agree on it.
+gob.RegisterName("main.Point", Point{})
+
+var buf bytes.Buffer
+enc := gob.NewEncoder(&buf)
+if err := enc.Encode(Box{Value: Point{X: 3, Y: 4}}); err != nil {
+	log.Fatal(err)
+}
+
+var b Box
+if err := gob.NewDecoder(&buf).Decode(&b); err != nil {
+	log.Fatal(err)
+}
+p := b.Value.(Point)
+fmt.Println(p.X, p.Y)

@@ -1,0 +1,7 @@
+nums := []int{1, 2, 3}
+
+var buf bytes.Buffer
+enc := gob.NewEncoder(&buf)
+if err := enc.Encode(nums); err != nil {
+	log.Fatal(err)
+}

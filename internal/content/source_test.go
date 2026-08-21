@@ -15,7 +15,7 @@ func TestFSSource(t *testing.T) {
 
 	fsys := fstest.MapFS{
 		"examples/encode-struct/python.py": {Data: []byte("py code\n")},
-		"examples/encode-struct/go.go":     {Data: []byte("go code\n")},
+		"examples/encode-struct/go.txt":    {Data: []byte("go code\n")},
 		"examples/encode-struct/.gitkeep":  {Data: nil},
 		"examples/encode-struct/ruby.rb":   {Data: []byte("ignored\n")},
 		"examples/empty-topic/.gitkeep":    {Data: nil},

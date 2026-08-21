@@ -97,6 +97,11 @@ go1.27rc2 run ./cmd/sync    # reads sources.json, rebuilds content/
 go1.27rc2 test ./...        # content feeds the render pipeline tests
 ```
 
+Go variants land as `content/examples/<topic>/go.txt`: a `.go` extension
+would make every topic directory look like a broken package to the Go
+toolchain, and the site derives the language from the filename stem, never
+the extension.
+
 Then commit the regenerated `content/` tree here. Sync reads each repo at
 the ref pinned in `sources.json` (currently `main` for all), via git, so
 uncommitted changes in a sibling repo are invisible to it.

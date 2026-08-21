@@ -1,0 +1,15 @@
+type Line struct {
+	From, To Point
+}
+
+var buf bytes.Buffer
+enc := gob.NewEncoder(&buf)
+if err := enc.Encode(Line{From: Point{X: 1, Y: 2}, To: Point{X: 3, Y: 4}}); err != nil {
+	log.Fatal(err)
+}
+
+var l Line
+if err := gob.NewDecoder(&buf).Decode(&l); err != nil {
+	log.Fatal(err)
+}
+fmt.Println("To.X =", l.To.X)

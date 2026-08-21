@@ -1,0 +1,18 @@
+var full, partial bytes.Buffer
+if err := gob.NewEncoder(&full).Encode(Point{X: 3, Y: 4}); err != nil {
+	log.Fatal(err)
+}
+if err := gob.NewEncoder(&partial).Encode(Point{X: 3, Y: 0}); err != nil {
+	log.Fatal(err)
+}
+
+// The zero-valued Y is absent from the wire, so the partial encoding
+// is shorter.
+fmt.Println("partial is shorter:", partial.Len() < full.Len())
+
+// The decoder restores omitted fields to their zero values.
+var p Point
+if err := gob.NewDecoder(&partial).Decode(&p); err != nil {
+	log.Fatal(err)
+}
+fmt.Println("X =", p.X, "Y =", p.Y)

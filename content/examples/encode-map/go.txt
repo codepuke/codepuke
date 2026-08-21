@@ -1,4 +1,4 @@
-counts := map[string]int{"apples": 3, "pears": 7}
+counts := map[string]int{"one": 1, "two": 2}
 
 var buf bytes.Buffer
 enc := gob.NewEncoder(&buf)
