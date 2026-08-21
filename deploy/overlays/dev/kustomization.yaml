@@ -22,7 +22,7 @@ resources:
 
 images:
   - name: ghcr.io/codepuke/codepuke
-    newTag: dev
+    newTag: sha-3ceb15db7d8dc73e646f61e44619b0cf4d6ea132
 
 patches:
   # Serve dev.codepuke.com only; drop the prod www->apex redirect middleware.
